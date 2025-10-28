@@ -4,9 +4,11 @@ import streamlit
 class SessionStateManager:
     def __init__(self, *persistent_keys: str):
         self._skip_delete = False
-        self._persistent_keys: set[str] = set(persistent_keys)
+        self._persistent_keys: set[str] = set()
         self._persistent_keys.add("django_orm_setup")
         # never remove the django state. It will cause multiple django instances which can cause db errors
+
+        self.add_persistent_keys(*persistent_keys)
 
     def add_persistent_keys(self, *persistent_keys: str):
         self._persistent_keys |= set(persistent_keys)
