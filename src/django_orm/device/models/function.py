@@ -16,3 +16,7 @@ class Function(models.Model):
 
     def __str__(self) -> str:
         return f"device=[{self.device}] | name={self.name}"
+
+    def get_execution_time(self, sample_number: int) -> int:
+        formula = self.execution_time_formula.replace("X", str(sample_number))
+        return eval(formula)
