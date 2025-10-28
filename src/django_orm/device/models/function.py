@@ -14,6 +14,9 @@ class Function(models.Model):
 
     execution_time_formula = models.CharField(max_length=255)
 
+    class Meta:
+        unique_together = ["device", "name"]
+
     def __str__(self) -> str:
         return f"device=[{self.device}] | name={self.name}"
 
