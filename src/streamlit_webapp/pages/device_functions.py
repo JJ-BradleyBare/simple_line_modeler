@@ -13,6 +13,10 @@ def callback_button_edit_table():
     streamlit.session_state["table_is_editable"] = True
 
 
+def callback_button_cancel_table():
+    streamlit.session_state["table_is_editable"] = False
+
+
 def callback_button_save_table():
     table_data_original = streamlit.session_state["table_data_original"]
     table_data_edited = streamlit.session_state["table_data_edited"]
@@ -94,7 +98,9 @@ with SessionStateManager(
     if streamlit.session_state.get("table_is_editable", False) is False:
         streamlit.button("Edit Table", on_click=callback_button_edit_table)
     else:
-        streamlit.button("Save Table", on_click=callback_button_save_table)
+        with streamlit.container(horizontal=True):
+            streamlit.button("Save Table", on_click=callback_button_save_table)
+            streamlit.button("Cancel Edits", on_click=callback_button_cancel_table)
 
     functions = Function.objects.all()
 
@@ -116,5 +122,4 @@ with SessionStateManager(
             num_rows="dynamic",
             column_order=("Device", "Function", "Execution Time Formula (sec)"),
             key="table_data_edits",
-            hide_index=False,
         )
