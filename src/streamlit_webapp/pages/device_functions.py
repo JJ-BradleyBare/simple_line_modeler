@@ -1,3 +1,5 @@
+import uuid
+
 import streamlit
 from utils import SessionStateManager, django_orm_setup, webapp_menu
 
@@ -59,7 +61,8 @@ def callback_button_save_table():
         device, _ = Device.objects.get_or_create(name=device_name)
 
         if "id" in data:
-            function = Function.objects.get(id=data["id"])
+            id = uuid.UUID(data["id"])
+            function = Function.objects.get(id=id)
             function.device = device
             function.name = function_name
             function.execution_time_formula = execution_time
@@ -71,7 +74,7 @@ def callback_button_save_table():
 
     for index in deletion_indexes:
         row = table_data_original[index]
-        id = row["id"]
+        id = uuid.UUID(row["id"])
 
         function = Function.objects.get(id=id)
         function.delete()
@@ -106,7 +109,7 @@ with SessionStateManager(
 
     data = streamlit.session_state["table_data_original"] = [
         {
-            "id": function.id,
+            "id": str(function.id),
             "Device": function.device.name,
             "Function": function.name,
             "Execution Time Formula (sec)": function.execution_time_formula,
