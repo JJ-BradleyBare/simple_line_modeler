@@ -6,5 +6,5 @@ streamlit.set_page_config(page_title="Home", layout="wide")
 django_orm_setup()
 webapp_menu()
 
-with SessionStateManager() as session_state_Manager:
+with SessionStateManager() as session_state_manager:
     pass
