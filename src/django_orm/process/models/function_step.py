@@ -9,4 +9,4 @@ class FunctionStep(BaseStep):
     function = models.ForeignKey(to=Function, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
-        return f"swim_lane=[{self.swim_lane}] | function=[{self.function}]"
+        return f"swimlane=[{self.swimlane}] | function=[{self.function}]"

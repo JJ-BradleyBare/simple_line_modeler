@@ -4,16 +4,16 @@ from django.db import models
 
 from .base_step import BaseStep
 from .process import Process
-from .swim_lane import SwimLane
+from .swimlane import Swimlane
 
 
 class ProcessStep(BaseStep):
     process = models.ForeignKey(to=Process, on_delete=models.CASCADE)
 
-    swim_lanes_constraint: models.ManyToManyField[SwimLane, ProcessStep] = models.ManyToManyField(
-        to=SwimLane,
+    swimlanes_constraint: models.ManyToManyField[Swimlane, ProcessStep] = models.ManyToManyField(
+        to=Swimlane,
         blank=True,
     )
 
     def __str__(self) -> str:
-        return f"swim_lane=[{self.swim_lane}] | process=[{self.process}] | swim_lanes_constraint=[{list(self.swim_lanes_constraint.all())}]"
+        return f"swimlane=[{self.swimlane}] | process=[{self.process}] | swimlanes_constraint=[{list(self.swimlanes_constraint.all())}]"

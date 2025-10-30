@@ -1,12 +1,15 @@
 import uuid
 
 from django.db import models
-from polymorphic.models import PolymorphicModel
 
 from .swimlane import Swimlane
 
 
-class BaseStep(PolymorphicModel):
+class SwimlaneIndex(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     swimlane = models.ForeignKey(to=Swimlane, on_delete=models.CASCADE)
+    index = models.PositiveIntegerField()
+
+    def __str__(self) -> str:
+        return f"swimlane=[{self.swimlane}] | index={self.index}"

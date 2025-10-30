@@ -1,10 +1,10 @@
 from django.contrib import admin
 
-from .models import FunctionStep, Process, ProcessStep, StepIndex, StepSynchronization, SwimLane, SwimLaneIndex
+from .models import FunctionStep, Process, ProcessStep, StepIndex, StepSynchronization, Swimlane, SwimlaneIndex
 
 admin.site.register(Process)
-admin.site.register(SwimLane)
-admin.site.register(SwimLaneIndex)
+admin.site.register(Swimlane)
+admin.site.register(SwimlaneIndex)
 admin.site.register(FunctionStep)
 admin.site.register(ProcessStep)
 admin.site.register(StepIndex)
