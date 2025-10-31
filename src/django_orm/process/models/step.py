@@ -20,6 +20,7 @@ class Step(PolymorphicModel):
     swimlanes_constraint: models.ManyToManyField[Swimlane, Step] = models.ManyToManyField(
         to=Swimlane,
         blank=True,
+        related_name="+",
     )
 
     def __str__(self) -> str:
