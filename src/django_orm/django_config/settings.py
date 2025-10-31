@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_orm.device",
     "django_orm.process",
+    "django_orm.timed_item",
 ]
 
 MIDDLEWARE = [

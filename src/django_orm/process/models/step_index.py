@@ -2,13 +2,13 @@ import uuid
 
 from django.db import models
 
-from .base_step import BaseStep
+from .step import Step
 
 
 class StepIndex(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    step = models.ForeignKey(to=BaseStep, on_delete=models.CASCADE)
+    step = models.ForeignKey(to=Step, on_delete=models.CASCADE)
     index = models.PositiveIntegerField()
 
     def __str__(self) -> str:

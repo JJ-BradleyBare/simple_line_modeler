@@ -1,21 +1,17 @@
-import uuid
-
 from django.db import models
+
+from django_orm.timed_item.models import BaseTimedItem
 
 from .device import Device
 
 
-class Function(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
-    name = models.CharField(max_length=255)
-
+class Function(BaseTimedItem):
     device = models.ForeignKey(to=Device, on_delete=models.CASCADE)
 
     execution_time_formula = models.CharField(max_length=255)
 
-    class Meta:
-        unique_together = ["device", "name"]
+    # class Meta:
+    #    unique_together = ["device", "name"]
 
     def __str__(self) -> str:
         return f"device=[{self.device}] | name={self.name}"

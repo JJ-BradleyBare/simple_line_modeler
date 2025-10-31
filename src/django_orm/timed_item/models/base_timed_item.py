@@ -3,10 +3,8 @@ import uuid
 from django.db import models
 from polymorphic.models import PolymorphicModel
 
-from .swimlane import Swimlane
 
-
-class BaseStep(PolymorphicModel):
+class BaseTimedItem(PolymorphicModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    swimlane = models.ForeignKey(to=Swimlane, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
