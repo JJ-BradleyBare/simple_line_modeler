@@ -1,5 +1,3 @@
-import typing
-
 import streamlit
 from utils import SessionStateManager, django_orm_setup, webapp_menu
 
@@ -9,7 +7,7 @@ django_orm_setup()
 webapp_menu()
 
 from django_orm.device.models import Function
-from django_orm.process.models import FunctionStep, Process, ProcessStep, StepIndex, Swimlane, SwimlaneIndex
+from django_orm.process.models import Process, StepIndex, Swimlane, SwimlaneIndex
 
 functions: dict[str, Function] = {
     f"{function.device.name} {function.name}": function for function in Function.objects.all()
@@ -23,6 +21,7 @@ def callback_selectbox_select_process():
 
 def callback_button_edit_process():
     streamlit.session_state["process_is_editable"] = True
+    streamlit.session_state["process_steps_deletion"] = []
 
 
 def callback_button_cancel_process():
@@ -31,11 +30,11 @@ def callback_button_cancel_process():
 
 def callback_button_save_process():
     selected_process = processes[str(streamlit.session_state["selected_process_key"])]
-    new_process_name = str(streamlit.session_state["text_input_process_name"])
 
+    # Update process name
+    new_process_name = str(streamlit.session_state["text_input_process_name"])
     selected_process.name = new_process_name
     selected_process.save()
-
     streamlit.session_state["selected_process_key"] = new_process_name
 
     streamlit.session_state["process_is_editable"] = False
@@ -59,8 +58,8 @@ with SessionStateManager(
     "process_is_editable",
     "selected_process_key",
     "text_input_process_name",
-    "selected_process_swimlanes",
-    "process_swimlane_steps",
+    "process_swimlanes",
+    "process_steps_deletion",
 ) as session_state_manager:
     process_is_editable = streamlit.session_state.get("process_is_editable", False)
 
@@ -99,8 +98,6 @@ with SessionStateManager(
             streamlit.button("Add Swimlane")
 
     with streamlit.container(horizontal=True):
-        session_state_manager.add_persistent_keys("process_swimlanes")
-
         if process_is_editable is False:
             streamlit.session_state["process_swimlanes"] = [
                 swimlane_index.swimlane
@@ -172,15 +169,6 @@ with SessionStateManager(
                     streamlit.session_state[f"process_swimlane_{process_swimlane.id}_steps"],
                 ):
                     with streamlit.container(border=True, gap=None):
-                        step_type = streamlit.selectbox(
-                            "Step Type",
-                            ["Device Function", "Process"],
-                            help="A step can reference either a single device function or a process made up of a set of complex Swimlanes and steps.",
-                            index=0 if isinstance(process_swimlane_step, FunctionStep) else 1,
-                            key=f"{process_swimlane_step.id}_selectbox_step_type",
-                            disabled=not process_is_editable,
-                        )
-                        streamlit.markdown("<br>", unsafe_allow_html=True)
                         streamlit.text_input(
                             "Step Parallelization Key",
                             help="Optional key that causes steps with the same key to be processes at the same time on the same device.",
@@ -190,29 +178,28 @@ with SessionStateManager(
 
                         streamlit.divider()
 
-                        if step_type == "Device Function":
-                            step_function_key = streamlit.selectbox(
-                                "Function",
-                                sorted(functions.keys()),
-                                key=f"{process_swimlane_step.id}_selectbox_function",
-                                disabled=not process_is_editable,
-                            )
-                        else:
-                            process_swimlane_step = typing.cast("ProcessStep", process_swimlane_step)
+                        step_timed_item_key_selectbox_items = sorted(
+                            list(functions.keys())
+                            + [
+                                f"Process: {process_key}"
+                                for process_key in processes
+                                if process_key != streamlit.session_state["selected_process_key"]
+                            ],
+                        )
+                        step_timed_item_key = streamlit.selectbox(
+                            "Function or Process",
+                            step_timed_item_key_selectbox_items,
+                            key=f"{process_swimlane_step.id}_selectbox_function",
+                            disabled=not process_is_editable,
+                        ).replace("Process: ", "")
 
-                            step_process_key = streamlit.selectbox(
-                                "Process",
-                                sorted(processes.keys()),
-                                key=f"{process_swimlane_step.id}_selectbox_process",
-                                disabled=not process_is_editable,
-                            )
-                            streamlit.markdown("<br>", unsafe_allow_html=True)
-
+                        if step_timed_item_key in processes:
                             step_process_swimlanes: dict[str, Swimlane] = {
                                 f"{swimlane.name}": swimlane
-                                for swimlane in Swimlane.objects.filter(process=processes[step_process_key]).all()
+                                for swimlane in Swimlane.objects.filter(process=processes[step_timed_item_key]).all()
                             }
 
+                            streamlit.markdown("<br>", unsafe_allow_html=True)
                             dependent_step_process_swimlane_keys = streamlit.multiselect(
                                 "Dependent Swim Lanes",
                                 sorted(step_process_swimlanes.keys()),
